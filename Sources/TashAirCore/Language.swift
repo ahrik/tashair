@@ -46,6 +46,10 @@ public enum Language: String, Codable, CaseIterable, Sendable, Identifiable {
         "Сводка": "Xulosa", "Наблюдения и оценки": "Kuzatuvlar va baholar", "Состояние источников": "Manbalar holati",
         "Как в macOS": "macOS bilan bir xil", "Ташкент · воздух, погода и солнце": "Toshkent · havo, ob-havo va quyosh",
         "Воздух, погода и солнце": "Havo, ob-havo va quyosh", "Глобально": "Global",
-        "Шкала US AQI": "US AQI shkalasi"
+        "Шкала US AQI": "US AQI shkalasi",
+        "Осадки сейчас": "Hozirgi yog‘in", "Часы": "Soat", "Минуты": "Daqiqa",
+        "Температура, осадки и качество воздуха каждый день в выбранное время.": "Har kuni tanlangan vaqtda harorat, yog‘in va havo sifati.",
+        "Пример уведомления по текущим данным": "Joriy ma’lumotlar bo‘yicha bildirishnoma namunasi",
+        "Проверить уведомление": "Bildirishnomani tekshirish", "Проверка сводки": "Xulosani tekshirish"
     ]
 }

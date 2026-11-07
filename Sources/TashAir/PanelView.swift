@@ -381,6 +381,26 @@ struct PanelView: View {
             }.font(.caption).frame(maxWidth: .infinity, alignment: .leading)
         }.font(.caption).foregroundStyle(.orange)
     }
+    private var dailySummarySettings: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Toggle(t("Ежедневная сводка"), isOn: Binding(get: { store.preferences.summary }, set: { store.enableSummary($0) }))
+            Text(t("Температура, осадки и качество воздуха каждый день в выбранное время.")).font(.caption).foregroundStyle(.secondary)
+            HStack {
+                Text(t("Время по Ташкенту")).font(.caption)
+                Spacer()
+                Picker(t("Часы"), selection: $store.preferences.summaryHour) { ForEach(0..<24) { Text(String(format: "%02d", $0)).tag($0) } }.frame(width: 65).labelsHidden()
+                Text(":")
+                Picker(t("Минуты"), selection: $store.preferences.summaryMinute) { ForEach(0..<60) { Text(String(format: "%02d", $0)).tag($0) } }.frame(width: 65).labelsHidden()
+            }
+            Text(t("Пример уведомления по текущим данным")).font(.caption).foregroundStyle(.secondary)
+            Text(store.summaryBody ?? t("Нет свежих данных для сводки"))
+                .font(.system(size: 11)).fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading).padding(10)
+                .background(.quaternary.opacity(0.4), in: RoundedRectangle(cornerRadius: 8))
+            Button(t("Проверить уведомление")) { Task { await store.testSummary() } }
+                .disabled(store.loading)
+        }
+    }
     private var settings: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
@@ -396,6 +416,8 @@ struct PanelView: View {
                     Spacer()
                     Button(t("Разрешить уведомления")) { Task { _ = await store.authorize() } }
                 }
+                dailySummarySettings
+                Divider()
                 ForEach(Array(store.preferences.rules.enumerated()), id: \.element.id) { index, rule in
                     VStack(alignment: .leading, spacing: 6) {
                         Toggle(t(rule.id == "heat" ? "Высокая температура" : rule.id == "cold" ? "Низкая температура" : rule.metric.title), isOn: Binding(get: { store.preferences.rules[index].enabled }, set: { store.enableRule(index, enabled: $0) }))
@@ -406,14 +428,6 @@ struct PanelView: View {
                             Text(rule.metric.unit).font(.caption).frame(width: 48, alignment: .leading)
                         }
                     }
-                }
-                Toggle(t("Ежедневная сводка"), isOn: Binding(get: { store.preferences.summary }, set: { store.enableSummary($0) }))
-                HStack {
-                    Text(t("Время по Ташкенту")).font(.caption)
-                    Spacer()
-                    Picker("", selection: $store.preferences.summaryHour) { ForEach(0..<24) { Text(String(format: "%02d", $0)).tag($0) } }.frame(width: 65).labelsHidden()
-                    Text(":")
-                    Picker("", selection: $store.preferences.summaryMinute) { ForEach(0..<60) { Text(String(format: "%02d", $0)).tag($0) } }.frame(width: 65).labelsHidden()
                 }
                 Button(t("Открыть настройки macOS")) { NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Notifications-Settings.extension")!) }
                 Divider()

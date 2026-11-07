@@ -131,15 +131,18 @@ struct Preferences: Codable {
             let qualification = metric == .kp ? t("Глобальные показатели") : t("Модельная оценка")
             await deliver(id: "threshold-\(event.rule.id)-\(Int(now.timeIntervalSince1970))", title: "TashAir · \(t("Порог достигнут"))", body: "\(t(metric.title)): \(metric.formatted(event.value)) \(metric.unit). \(qualification). \(Tashkent.date(now))", section: metric.section)
         }
-        if summary {
-            let fields = [Metric.aqi, .temperature, .uv, .kp].compactMap { metric -> String? in
-                guard snapshot.isFresh(metric, at: now), let value = snapshot.value(metric, at: now) else { return nil }
-                return "\(metric.formatted(value)) \(metric.unit)"
-            }
-            if !fields.isEmpty {
-                await deliver(id: "summary-\(Tashkent.date(now, format: "yyyy-MM-dd"))", title: t("Сводка по Ташкенту"), body: fields.joined(separator: " · ") + "\n" + t("Модельная оценка") + " · " + Tashkent.date(now), section: "overview")
-            }
+        if summary, let body = summaryBody {
+            await deliver(id: "summary-\(Tashkent.date(now, format: "yyyy-MM-dd"))", title: t("Сводка по Ташкенту"), body: body, section: "overview")
         }
+    }
+    var summaryBody: String? {
+        DailySummary.body(snapshot: snapshot, failed: Set(errors.keys), at: now, language: language)
+    }
+    func testSummary() async {
+        guard await authorize() else { return }
+        await refresh()
+        guard let body = summaryBody else { problem = t("Нет свежих данных для сводки"); return }
+        await deliver(id: "summary-test", title: "TashAir · " + t("Проверка сводки"), body: body, section: "overview")
     }
     private func deliver(id: String, title: String, body: String, section: String) async {
         let content = UNMutableNotificationContent()
