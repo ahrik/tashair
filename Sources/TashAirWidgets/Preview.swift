@@ -33,10 +33,27 @@ import WidgetKit
                 }
             }
         }
-        print("Rendered 52 widget previews to \(directory.path)")
+        for topic in WidgetTopic.allCases {
+            for language in [WidgetLanguage.ru, .uz] {
+                for dark in [false, true] {
+                    for (family, size, name) in [(WidgetFamily.systemSmall, NSSize(width: 170, height: 170), "small"), (.systemMedium, NSSize(width: 360, height: 170), "medium"), (.systemLarge, NSSize(width: 360, height: 376), "large")] {
+                        for state in ["fresh", "saved", "empty"] {
+                            let config = Configuration(); config.language = language
+                            let entry = Entry(date: Date().addingTimeInterval(state == "saved" ? 86400 : 0), configuration: config, snapshot: state == "empty" ? EnvironmentSnapshot() : snapshot)
+                            let content = TopicWidgetView(entry: entry, topic: topic, previewFamily: family)
+                            try render(content: content, size: size, dark: dark, path: directory.appendingPathComponent("\(topic.rawValue)-\(name)-\(language.rawValue)-\(dark ? "dark" : "light")-\(state).png"))
+                        }
+                    }
+                }
+            }
+        }
+        print("Rendered 160 widget previews to \(directory.path)")
     }
     @MainActor private static func render(entry: Entry, family: WidgetFamily, size: NSSize, dark: Bool, path: URL) throws {
-        let content = TashAirWidgetView(entry: entry, previewFamily: family)
+        try render(content: TashAirWidgetView(entry: entry, previewFamily: family), size: size, dark: dark, path: path)
+    }
+    @MainActor private static func render<Content: View>(content: Content, size: NSSize, dark: Bool, path: URL) throws {
+        let content = content
             .padding(16).frame(width: size.width, height: size.height)
             .background(Color(nsColor: .windowBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: 22))

@@ -153,8 +153,245 @@ struct TashAirWidget: Widget {
     }
 }
 
+
+// Each topic has a stable gallery identity and requests only its own sources.
+enum WidgetTopic: String, CaseIterable {
+    case air, weather, solar
+    var title: String {
+        switch self { case .air: "Воздух"; case .weather: "Погода"; case .solar: "Солнечная активность" }
+    }
+    var symbol: String {
+        switch self { case .air: "aqi.medium"; case .weather: "cloud.sun.fill"; case .solar: "sun.max.fill" }
+    }
+    var feeds: [Feed] {
+        switch self { case .air: [.air]; case .weather: [.weather]; case .solar: [.weather, .space, .flares] }
+    }
+    var link: URL {
+        switch self { case .air: Metric.aqi.link; case .weather: Metric.temperature.link; case .solar: Metric.uv.link }
+    }
+    var source: String {
+        switch self { case .air: "Open-Meteo · CAMS"; case .weather: "Open-Meteo"; case .solar: "Open-Meteo / NOAA SWPC" }
+    }
+}
+
+struct TopicConfiguration: WidgetConfigurationIntent {
+    static let title: LocalizedStringResource = "Настроить виджет"
+    @Parameter(title: "Язык", default: .system) var language: WidgetLanguage
+}
+
+struct TopicProvider: AppIntentTimelineProvider {
+    let topic: WidgetTopic
+    func placeholder(in context: Context) -> Entry {
+        Entry(date: Date(), configuration: Configuration(), snapshot: EnvironmentSnapshot())
+    }
+    func snapshot(for configuration: TopicConfiguration, in context: Context) async -> Entry {
+        makeEntry(configuration, state: await Provider.repository.state(), at: Date())
+    }
+    func timeline(for configuration: TopicConfiguration, in context: Context) async -> Timeline<Entry> {
+        let state = await Provider.repository.refresh(feeds: topic.feeds)
+        let now = Date()
+        let dates = [now] + (1...8).map { now.addingTimeInterval(Double($0) * 900) }
+        return Timeline(entries: dates.map { makeEntry(configuration, state: state, at: $0) },
+                        policy: .after(now.addingTimeInterval(1800)))
+    }
+    private func makeEntry(_ configuration: TopicConfiguration, state: RefreshState, at date: Date) -> Entry {
+        let config = Configuration()
+        config.language = configuration.language
+        return Entry(date: date, configuration: config, snapshot: state.snapshot, failed: Set(state.errors.keys))
+    }
+}
+
+struct TopicWidgetView: View {
+    @Environment(\.widgetFamily) private var family
+    let entry: Entry
+    let topic: WidgetTopic
+    var previewFamily: WidgetFamily? = nil
+    private var size: WidgetFamily { previewFamily ?? family }
+    private var compact: Bool { size == .systemSmall }
+    private var snapshot: EnvironmentSnapshot { entry.snapshot }
+    private func t(_ key: String) -> String { entry.configuration.language.language.text(key) }
+    private var visibleFeeds: [Feed] { compact && topic == .solar ? [.weather] : topic.feeds }
+    private var saved: Bool { visibleFeeds.contains { !snapshot.isFresh($0, at: entry.date) || entry.failed.contains($0) } }
+    private var checked: Date? { visibleFeeds.compactMap { snapshot.fetched[$0] }.min() }
+    private var today: Day? {
+        snapshot.weather?.days.first { Tashkent.calendar.isDate($0.time, inSameDayAs: entry.date) }
+    }
+    var body: some View {
+        VStack(alignment: .leading, spacing: compact ? 6 : 7) {
+            HStack(spacing: 4) {
+                Image(systemName: topic.symbol).foregroundStyle(.teal)
+                Text(t(topic.title)).fontWeight(.semibold).lineLimit(1).minimumScaleFactor(0.7)
+                Spacer(minLength: 0)
+                if !compact { Text(t("Ташкент")).foregroundStyle(.secondary) }
+            }.font(.system(size: 11))
+            switch topic {
+            case .air: air
+            case .weather: weather
+            case .solar: solar
+            }
+            if size == .systemLarge { forecast }
+            Spacer(minLength: 0)
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 3) {
+                    if saved { Image(systemName: "clock.badge.exclamationmark") }
+                    Text(t(checked == nil ? "Нет данных" : saved ? "Сохранённые данные" : "Проверено"))
+                    if let checked { Text(Tashkent.date(checked, format: "HH:mm")) }
+                }.foregroundStyle(saved ? .orange : .secondary)
+                Text(compact && topic == .solar ? "Open-Meteo" : topic.source).foregroundStyle(.secondary)
+            }.font(.system(size: 9)).lineLimit(1).minimumScaleFactor(0.7)
+        }
+        .containerBackground(.background, for: .widget)
+        .widgetURL(topic.link)
+        .environment(\.timeZone, Tashkent.timeZone)
+        .environment(\.locale, Locale(identifier: entry.configuration.language.language == .uz ? "uz_UZ" : "ru_RU"))
+    }
+    private func value(_ value: Double?, unit: String, prominent: Bool = false) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 3) {
+            Text(value.flatMap { $0.isFinite ? String(format: ["Kp", "µg/m³", t("м/с")].contains(unit) ? "%.1f" : "%.0f", $0) : nil } ?? "—")
+                .font(.system(size: prominent ? (compact ? 34 : 30) : 18, weight: .medium, design: .rounded)).monospacedDigit()
+            Text(unit).font(.system(size: 10)).foregroundStyle(.secondary)
+        }.lineLimit(1).minimumScaleFactor(0.65)
+    }
+    private func detail(_ title: String, value number: Double?, unit: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(t(title)).font(.system(size: 10)).foregroundStyle(.secondary)
+            value(number, unit: unit)
+        }.frame(maxWidth: .infinity, alignment: .leading)
+    }
+    private var air: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            HStack(alignment: .firstTextBaseline) {
+                value(snapshot.air?.aqi, unit: "US AQI", prominent: true)
+                if !compact { detail("PM2.5", value: snapshot.air?.pm25, unit: "µg/m³") }
+            }
+            Text(t(snapshot.air.map { AirQuality.title($0.aqi ?? .nan) } ?? "Нет данных"))
+                .font(.system(size: 11)).lineLimit(2).minimumScaleFactor(0.8)
+            if !compact {
+                HStack {
+                    detail("PM10", value: snapshot.air?.pm10, unit: "µg/m³")
+                    detail("Пыль", value: snapshot.air?.dust, unit: "µg/m³")
+                }
+            }
+            if compact { Text(t("Модельная оценка")).font(.system(size: 9)).foregroundStyle(.secondary) }
+        }
+    }
+    private var weather: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            HStack {
+                value(snapshot.weather?.temperature, unit: "°C", prominent: true)
+                Image(systemName: WeatherCode.symbol(snapshot.weather?.code)).symbolRenderingMode(.multicolor)
+                if !compact {
+                    Spacer()
+                    detail("Ощущается", value: snapshot.weather?.apparent, unit: "°C")
+                    detail("Ветер", value: snapshot.weather?.wind, unit: t("м/с"))
+                }
+            }
+            Text(t(WeatherCode.title(snapshot.weather?.code))).font(.system(size: 11)).lineLimit(1)
+            HStack(spacing: 8) {
+                Text("↓ " + (today?.minimum.map { String(format: "%.0f°", $0) } ?? "—"))
+                Text("↑ " + (today?.maximum.map { String(format: "%.0f°", $0) } ?? "—"))
+                if !compact { Text(t("Осадки") + ": " + (today?.precipitation.map { String(format: "%.1f", $0) } ?? "—") + " " + t("мм")) }
+            }.font(.system(size: 10)).foregroundStyle(.secondary).lineLimit(1)
+        }
+    }
+    private var solar: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            HStack(alignment: .firstTextBaseline) {
+                value(snapshot.value(.uv, at: entry.date), unit: "UV", prominent: true)
+                if !compact {
+                    Link(destination: Metric.kp.link) {
+                        detail("Глобально", value: snapshot.value(.kp, at: entry.date), unit: "Kp")
+                    }.buttonStyle(.plain)
+                    detail("Максимальный УФ", value: today?.uv, unit: "UV")
+                }
+            }
+            HStack(spacing: 8) {
+                Label(today?.sunrise.map { Tashkent.date($0, format: "HH:mm") } ?? "—", systemImage: "sunrise")
+                Label(today?.sunset.map { Tashkent.date($0, format: "HH:mm") } ?? "—", systemImage: "sunset")
+            }.font(.system(size: 10)).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.8)
+            if !compact {
+                Link(destination: Metric.kp.link) {
+                    let flare = snapshot.flares.filter { $0.time <= entry.date }.max { $0.time < $1.time }
+                    Text(t("Солнечные вспышки") + ": " + (flare.map { $0.classification + " · " + Tashkent.date($0.time) } ?? t("Нет данных")))
+                        .font(.system(size: 10)).foregroundStyle(.secondary).lineLimit(1)
+                }.buttonStyle(.plain)
+            }
+        }
+    }
+    @ViewBuilder private var forecast: some View {
+        Divider()
+        Text(t("Прогноз")).font(.system(size: 11)).foregroundStyle(.secondary)
+        if topic == .solar {
+            let points = snapshot.space.filter { $0.kind == .predicted && $0.time >= entry.date }.prefix(8)
+            if points.isEmpty { Text(t("Нет данных")).font(.caption).foregroundStyle(.secondary) }
+            else {
+                Chart(Array(points)) { point in
+                    BarMark(x: .value("Time", point.time), y: .value("Kp", point.value)).foregroundStyle(.teal)
+                }.chartYScale(domain: 0...9).chartXAxis { AxisMarks(values: .automatic(desiredCount: 3)) }.frame(height: 95)
+            }
+            Text(t("Глобальные показатели") + " · NOAA SWPC").font(.system(size: 10)).foregroundStyle(.secondary)
+        } else {
+            let hours = (topic == .air ? snapshot.air?.hours : snapshot.weather?.hours) ?? []
+            let upcoming = hours.filter { $0.time >= entry.date && $0.time < entry.date.addingTimeInterval(86400) }
+            let values = upcoming.compactMap { topic == .air ? $0.aqi : $0.temperature }
+            if values.isEmpty { Text(t("Нет данных")).font(.caption).foregroundStyle(.secondary) }
+            else {
+                Chart {
+                    ForEach(Array(upcoming.enumerated()), id: \.element.id) { index, hour in
+                        if let number = topic == .air ? hour.aqi : hour.temperature {
+                            let segment = upcoming.prefix(index).filter { (topic == .air ? $0.aqi : $0.temperature) == nil }.count
+                            LineMark(x: .value("Time", hour.time), y: .value(topic == .air ? "US AQI" : "°C", number), series: .value("Segment", segment)).foregroundStyle(.teal)
+                        }
+                    }
+                }.chartXAxis { AxisMarks(values: .automatic(desiredCount: 3)) }.chartLegend(.hidden).frame(height: 85)
+            }
+            Text(topic == .air ? "US AQI · " + t("Модельная оценка") : "°C · " + t("Модельная оценка"))
+                .font(.system(size: 10)).foregroundStyle(.secondary)
+            if topic == .weather {
+                HStack {
+                    ForEach(Array((snapshot.weather?.days ?? []).filter { $0.time >= Tashkent.calendar.startOfDay(for: entry.date) }.prefix(5))) { day in
+                        VStack(spacing: 3) {
+                            Text(Tashkent.date(day.time, format: "dd.MM"))
+                            Image(systemName: WeatherCode.symbol(day.code)).symbolRenderingMode(.multicolor)
+                            Text(day.maximum.map { String(format: "%.0f°", $0) } ?? "—")
+                        }.font(.system(size: 10)).frame(maxWidth: .infinity)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@MainActor private struct TopicWidget {
+    let topic: WidgetTopic
+    var body: some WidgetConfiguration {
+        AppIntentConfiguration(kind: "TashAirTopic-" + topic.rawValue, intent: TopicConfiguration.self,
+                               provider: TopicProvider(topic: topic)) { entry in
+            TopicWidgetView(entry: entry, topic: topic)
+        }
+        .configurationDisplayName(LocalizedStringKey(topic.title))
+        .description("Ташкент · воздух, погода и солнце")
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+    }
+}
+
+struct AirWidget: Widget {
+    var body: some WidgetConfiguration { TopicWidget(topic: .air).body }
+}
+struct WeatherWidget: Widget {
+    var body: some WidgetConfiguration { TopicWidget(topic: .weather).body }
+}
+struct SolarWidget: Widget {
+    var body: some WidgetConfiguration { TopicWidget(topic: .solar).body }
+}
+
 #if !WIDGET_PREVIEW
 @main struct TashAirWidgets: WidgetBundle {
-    var body: some Widget { TashAirWidget() }
+    var body: some Widget {
+        TashAirWidget()
+        AirWidget()
+        WeatherWidget()
+        SolarWidget()
+    }
 }
 #endif
