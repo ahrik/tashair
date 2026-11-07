@@ -41,7 +41,7 @@ python3 scripts/check-distribution.py --universal
 
 ## Документация
 
-Сайт книги подготовлен для GitHub Pages по адресу `https://ahrik.github.io/tashair/`; он станет доступен после публикации репозитория и включения Pages.
+**[Книга документации](https://ahrik.github.io/tashair/)** — установка, руководство, виджеты, уведомления и источники данных. Есть оглавление и поиск.
 
 - [Руководство пользователя](docs/USER_GUIDE.md)
 - [Виджеты macOS](docs/WIDGETS.md)
@@ -56,6 +56,6 @@ python3 scripts/check-distribution.py --universal
 
 Код и документация — [MIT](LICENSE). Права на данные определяются отдельно их поставщиками. Бесплатный API Open-Meteo рассчитан на некоммерческое использование; открытость исходников сама по себе не разрешает бесплатное использование API коммерческими форками.
 
-Целевой публичный репозиторий — `ahrik/tashair`; исходники подготовлены для публикации владельцем. Следующее направление — подключение реальных станций при подтверждённом доступе к данным.
+Исходники опубликованы в [ahrik/tashair](https://github.com/ahrik/tashair). Следующее направление — подключение реальных станций при подтверждённом доступе к данным.
 
 **English:** TashAir is a free, open-source macOS menu bar app for Tashkent air quality, weather, UV and global space weather. It uses model data from Open-Meteo/CAMS and observations and forecasts from NOAA SWPC. Russian and Uzbek UI; MIT-licensed source.

@@ -78,8 +78,14 @@ struct Preferences: Codable {
         await evaluateNotifications()
     }
     func checkPermission() async {
-        let status = await center.notificationSettings().authorizationStatus
-        notificationPermission = status == .authorized || status == .provisional
+        // Older SDKs do not mark UNNotificationSettings as Sendable.
+        // Read it inside the completion handler and transfer only a Bool to the main actor.
+        notificationPermission = await withCheckedContinuation { continuation in
+            center.getNotificationSettings { settings in
+                let status = settings.authorizationStatus
+                continuation.resume(returning: status == .authorized || status == .provisional)
+            }
+        }
     }
     func authorize() async -> Bool {
         do { _ = try await center.requestAuthorization(options: [.alert, .sound]); await checkPermission() }
