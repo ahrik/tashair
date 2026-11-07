@@ -2,6 +2,10 @@
 
 Нужны macOS 14 или новее. Универсальный образ содержит Apple Silicon и Intel.
 
+**[Скачать TashAir.dmg — v0.1.0](https://github.com/ahrik/tashair/releases/download/v0.1.0/TashAir.dmg)**
+
+Альтернатива: [TashAir-macOS.zip](https://github.com/ahrik/tashair/releases/download/v0.1.0/TashAir-macOS.zip). [Контрольные суммы SHA256SUMS](https://github.com/ahrik/tashair/releases/download/v0.1.0/SHA256SUMS) · [Страница релиза](https://github.com/ahrik/tashair/releases/tag/v0.1.0).
+
 1. Откройте `TashAir.dmg`.
 2. Перетащите `TashAir.app` в `Applications`.
 3. Запустите приложение из папки «Программы», извлеките образ.

@@ -22,6 +22,12 @@
 
 Пример интерфейса от 7 ноября 2026 года. Данные: Open-Meteo / CAMS Global, NOAA SWPC.
 
+## Скачать
+
+**[Скачать TashAir для macOS — DMG](https://github.com/ahrik/tashair/releases/download/v0.1.0/TashAir.dmg)** · [ZIP](https://github.com/ahrik/tashair/releases/download/v0.1.0/TashAir-macOS.zip) · [SHA256SUMS](https://github.com/ahrik/tashair/releases/download/v0.1.0/SHA256SUMS)
+
+Универсальная сборка для Apple Silicon и Intel. [Инструкция установки](docs/INSTALLATION.md). Подпись локальная (ad hoc), без нотариализации Apple.
+
 ## Сборка и запуск
 
 Нужен полный Xcode со Swift 6 и macOS SDK. Сторонние библиотеки не требуются.

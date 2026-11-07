@@ -1,0 +1,33 @@
+name: Release
+on:
+  push:
+    tags:
+      - 'v*'
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: macos-15
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tests
+        run: bash scripts/swift.sh test -c release
+      - name: Universal distribution
+        run: TASHAIR_UNIVERSAL=1 bash scripts/build-dmg.sh
+      - name: Verify distribution
+        run: python3 scripts/check-distribution.py --universal
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            temp/outputs/TashAir.dmg temp/outputs/TashAir-macOS.zip temp/outputs/SHA256SUMS \
+            --repo "$GITHUB_REPOSITORY" --verify-tag --draft \
+            --title "TashAir $GITHUB_REF_NAME" --notes-file docs/RELEASE_NOTES.md
+          gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --draft=false --latest

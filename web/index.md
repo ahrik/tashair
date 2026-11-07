@@ -4,7 +4,9 @@
 
 Посмотрите качество воздуха, прогноз погоды, УФ и солнечную активность в одной панели. TashAir работает бесплатно, без регистрации, рекламы и аналитики. Код открыт под MIT.
 
-<p class="download-row"><a class="download" href="../docs/INSTALLATION.md">Установить TashAir</a><a href="../docs/USER_GUIDE.md">Открыть руководство</a></p>
+<p class="download-row"><a class="download" href="https://github.com/ahrik/tashair/releases/download/v0.1.0/TashAir.dmg">Скачать TashAir для macOS</a><a href="../docs/INSTALLATION.md">Как установить</a><a href="../docs/USER_GUIDE.md">Открыть руководство</a></p>
+
+[ZIP вместо DMG](https://github.com/ahrik/tashair/releases/download/v0.1.0/TashAir-macOS.zip) · [Контрольные суммы](https://github.com/ahrik/tashair/releases/download/v0.1.0/SHA256SUMS)
 
 Версия 0.1.0. macOS 14 и новее, Apple Silicon и Intel. Интерфейс на русском и узбекском. Сборка пока с локальной подписью, без нотариализации Apple.
 
@@ -16,7 +18,7 @@
 
 - **[Установка](../docs/INSTALLATION.md):** как собрать приложение, открыть DMG и перенести его в «Программы».
 - **[Руководство](../docs/USER_GUIDE.md):** строка меню, показатели, прогнозы и история за 30 дней.
-- **[Виджеты macOS](../docs/WIDGETS.md):** три размера, выбор языка и показателя.
+- **[Виджеты macOS](../docs/WIDGETS.md):** общая сводка, воздух, погода и солнечная активность в трёх размерах.
 - **[Уведомления](../docs/ALERTS.md):** пороги, ежедневная сводка и ограничения доставки.
 
 ## Что показывает приложение
