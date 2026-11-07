@@ -118,7 +118,8 @@ struct PanelView: View {
     }
     private var header: some View {
         HStack(spacing: 10) {
-            Image(systemName: "aqi.medium").font(.system(size: 24, weight: .medium)).foregroundStyle(.teal)
+            Image(nsImage: NSApplication.shared.applicationIconImage)
+                .resizable().scaledToFit().frame(width: 32, height: 32).accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text("TashAir").font(.system(size: 19, weight: .semibold))
                 Text(t("Воздух, погода и солнце")).font(.system(size: 10)).foregroundStyle(.secondary)

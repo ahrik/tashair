@@ -1,3 +1,5 @@
+<img src="web/assets/logo.png" width="112" height="112" alt="Логотип TashAir: потоки воздуха и солнце" />
+
 # TashAir
 
 **Воздух, погода и солнечная активность Ташкента — в строке меню macOS.**

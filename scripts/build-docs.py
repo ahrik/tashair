@@ -109,10 +109,10 @@ for source_name, filename, title in PAGES:
 <title>{html.escape(title)} — TashAir</title>
 <meta name="description" content="Воздух, погода, УФ и космическая погода Ташкента в строке меню macOS. Установка и документация TashAir.">
 <meta name="color-scheme" content="light"><link rel="canonical" href="{BASE_URL + filename}">
-<link rel="icon" href="assets/mark.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/logo.png" type="image/png"><link rel="stylesheet" href="assets/style.css">
 <script src="assets/site.js" defer></script></head><body>
 <a class="skip" href="#content">Перейти к содержимому</a>
-<header class="topbar"><a class="brand" href="index.html"><img src="assets/mark.svg" alt="" width="37" height="37">TashAir<span>Документация</span></a>
+<header class="topbar"><a class="brand" href="index.html"><img src="assets/logo.png" alt="" width="37" height="37">TashAir<span>Документация</span></a>
 <nav class="toplinks" aria-label="Ссылки проекта"><a href="{REPOSITORY}">GitHub</a><a class="download" href="installation.html">Установить</a><button class="menu-button" type="button" aria-controls="sidebar" aria-expanded="false">Меню</button></nav></header>
 <div class="layout"><aside class="sidebar" id="sidebar"><label class="search-label" for="search">Поиск по документации</label><input class="search" id="search" type="search" placeholder="Например, уведомления" autocomplete="off"><nav class="pages" aria-label="Разделы документации">{navigation(filename)}</nav><p class="sidebar-note">macOS 14 и новее<br>Интерфейс: русский и узбекский<br>Бесплатно, с открытым кодом</p></aside>
 <main id="content"><div class="article"><section class="search-results" aria-label="Результаты поиска" aria-live="polite" hidden></section><article>{content}</article>
