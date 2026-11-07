@@ -77,11 +77,19 @@ struct ProviderTests {
         #expect(Tashkent.date(Tashkent.calendar.startOfDay(for: date), format: "HH:mm") == "00:00")
     }
     @Test func aqiBoundaryCategories() {
-        #expect(AirQuality.band(50) == 0)
-        #expect(AirQuality.band(51) == 1)
-        #expect(AirQuality.band(101) == 2)
-        #expect(AirQuality.band(201) == 4)
-        #expect(AirQuality.band(301) == 5)
+        let boundaries: [(Double, AirQualityLevel)] = [
+            (0, .good), (50, .good), (51, .moderate), (64, .moderate), (100, .moderate),
+            (101, .sensitive), (150, .sensitive), (151, .unhealthy), (200, .unhealthy),
+            (201, .veryUnhealthy), (300, .veryUnhealthy), (301, .hazardous), (500, .hazardous), (501, .hazardous)
+        ]
+        for (value, level) in boundaries {
+            #expect(AirQuality.level(value) == level)
+            #expect(AirQuality.band(value) == level.rawValue)
+        }
+        #expect(AirQuality.level(nil) == nil)
+        #expect(AirQuality.level(-1) == nil)
+        #expect(AirQuality.level(.nan) == nil)
+        #expect(AirQuality.level(.infinity) == nil)
     }
     @Test func malformedWeatherCodeCannotCrashPresentation() {
         #expect(WeatherCode.title(1e100) == "Нет данных")

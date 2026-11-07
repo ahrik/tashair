@@ -177,12 +177,55 @@ public struct EnvironmentSnapshot: Codable, Sendable {
     }
 }
 
+public enum AirQualityLevel: Int, CaseIterable, Sendable, Identifiable {
+    case good, moderate, sensitive, unhealthy, veryUnhealthy, hazardous
+    public var id: Int { rawValue }
+    public var title: String {
+        switch self {
+        case .good: "Хорошее"
+        case .moderate: "Умеренное"
+        case .sensitive: "Вредно для чувствительных групп"
+        case .unhealthy: "Вредное"
+        case .veryUnhealthy: "Очень вредное"
+        case .hazardous: "Опасное"
+        }
+    }
+    public var rangeLabel: String {
+        switch self {
+        case .good: "0–50"
+        case .moderate: "51–100"
+        case .sensitive: "101–150"
+        case .unhealthy: "151–200"
+        case .veryUnhealthy: "201–300"
+        case .hazardous: "301+"
+        }
+    }
+    /// Accessible tones of the six US AQI category colours, shared by the panel and menu bar.
+    public var backgroundHex: UInt32 {
+        switch self {
+        case .good: 0x27823D
+        case .moderate: 0xF4D34B
+        case .sensitive: 0xE98327
+        case .unhealthy: 0xC83C45
+        case .veryUnhealthy: 0x8453A3
+        case .hazardous: 0x7A243A
+        }
+    }
+    public var foregroundHex: UInt32 {
+        switch self { case .moderate, .sensitive: 0x18211D; default: 0xFFFFFF }
+    }
+}
+
 public enum AirQuality {
     public static func band(_ value: Double) -> Int {
         switch value { case ...50: 0; case ...100: 1; case ...150: 2; case ...200: 3; case ...300: 4; default: 5 }
     }
     public static func title(_ value: Double) -> String {
-        ["Хорошее", "Умеренное", "Вредно для чувствительных групп", "Вредное", "Очень вредное", "Опасное"][band(value)]
+        level(value)?.title ?? "Нет данных"
+    }
+    public static func level(_ value: Double?) -> AirQualityLevel? {
+        guard let value, value.isFinite, value >= 0 else { return nil }
+        return AirQualityLevel(rawValue: band(value))
     }
 }
 

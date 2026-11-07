@@ -45,6 +45,7 @@ public enum Language: String, Codable, CaseIterable, Sendable, Identifiable {
         "ч": "soat", "мин": "daq", "м/с": "m/s", "мм": "mm", "км": "km", "Открыть приложение": "Dasturni ochish",
         "Сводка": "Xulosa", "Наблюдения и оценки": "Kuzatuvlar va baholar", "Состояние источников": "Manbalar holati",
         "Как в macOS": "macOS bilan bir xil", "Ташкент · воздух, погода и солнце": "Toshkent · havo, ob-havo va quyosh",
-        "Воздух, погода и солнце": "Havo, ob-havo va quyosh", "Глобально": "Global"
+        "Воздух, погода и солнце": "Havo, ob-havo va quyosh", "Глобально": "Global",
+        "Шкала US AQI": "US AQI shkalasi"
     ]
 }

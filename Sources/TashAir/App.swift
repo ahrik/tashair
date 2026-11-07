@@ -1,4 +1,5 @@
 import AppKit
+import Observation
 import SwiftUI
 import TashAirCore
 import UserNotifications
@@ -9,6 +10,7 @@ import UserNotifications
     private let popover = NSPopover()
     private var observer: NSObjectProtocol?
     private var ticker: Timer?
+    private var badgeStyle: StatusBadgeStyle?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         if let index = CommandLine.arguments.firstIndex(of: "--verify"), CommandLine.arguments.count > index + 1 {
@@ -37,18 +39,53 @@ import UserNotifications
         ticker = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.updateStatus() }
         }
-        updateStatus(); store.start()
+        observeStatus(); store.start()
         if CommandLine.arguments.contains("--preview") { show() }
     }
+    private func observeStatus() {
+        withObservationTracking {
+            updateStatus()
+        } onChange: { [weak self] in
+            Task { @MainActor in self?.observeStatus() }
+        }
+    }
     private func updateStatus() {
+        guard let button = statusItem.button else { return }
         let metric = store.preferences.menuMetric
         let snapshot = store.snapshot
         let now = Date()
-        let value = metric.formatted(snapshot.value(metric, at: now))
-        let saved = snapshot.isFresh(metric, at: now) ? "" : " ◦"
-        statusItem.button?.title = " \(value) \(metric == .temperature ? "°" : metric == .aqi ? "AQI" : metric.unit)\(saved)"
-        statusItem.button?.font = .monospacedDigitSystemFont(ofSize: 12, weight: .medium)
-        statusItem.button?.toolTip = "TashAir · \(store.t("Ташкент"))\n\(store.t(metric.title)) · \(store.t(metric == .kp ? "Глобальные показатели" : "Модельная оценка"))\(saved.isEmpty ? "" : "\n" + store.t("Сохранённые данные"))"
+        let airMetric = metric == .aqi || metric == .pm25
+        let feed: Feed = airMetric ? .air : metric == .kp ? .space : .weather
+        let rawValue = snapshot.value(metric, at: now)
+        let available = rawValue?.isFinite == true && (metric != .aqi || AirQuality.level(rawValue) != nil)
+        let value = metric.formatted(available ? rawValue : nil)
+        let fresh = available && snapshot.isFresh(metric, at: now) && store.errors[feed] == nil
+        let saved = fresh ? "" : " ◦"
+        let title = "\(value) \(metric == .temperature ? "°" : metric == .aqi ? "AQI" : metric.unit)\(saved)"
+        let level = fresh && airMetric ? AirQuality.level(snapshot.air?.aqi) : nil
+        if airMetric {
+            let style = StatusBadgeStyle(title: title, level: level, height: max(18, min(26, button.bounds.height - 4)))
+            if badgeStyle != style {
+                button.title = ""
+                let image = StatusBadgeRenderer.image(style)
+                button.image = image
+                button.imagePosition = .imageOnly
+                statusItem.length = image.size.width + 8
+                badgeStyle = style
+            }
+        } else {
+            badgeStyle = nil
+            button.image = NSImage(systemSymbolName: "aqi.medium", accessibilityDescription: nil)
+            button.imagePosition = .imageLeading
+            button.title = " " + title
+            button.font = .monospacedDigitSystemFont(ofSize: 12, weight: .medium)
+            statusItem.length = NSStatusItem.variableLength
+        }
+        var tooltip = "TashAir · \(store.t("Ташкент"))\n\(store.t(metric.title)): \(title)\n\(store.t(metric == .kp ? "Глобальные показатели" : "Модельная оценка"))"
+        if let level { tooltip += "\n\(store.t(level.title)) · \(level.rangeLabel) US AQI" }
+        if !fresh { tooltip += "\n" + store.t(available ? "Сохранённые данные" : "Нет данных") }
+        button.toolTip = tooltip
+        button.setAccessibilityLabel(tooltip.replacingOccurrences(of: "\n", with: ", "))
     }
     @objc private func toggle() { if popover.isShown { popover.performClose(nil) } else { show() } }
     private func show() {

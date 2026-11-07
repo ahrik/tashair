@@ -164,8 +164,23 @@ struct PanelView: View {
         }.font(.system(size: 10)).foregroundStyle(.secondary)
     }
     private var aqiColor: Color {
-        guard let value = snapshot.air?.aqi else { return .secondary }
-        return [.green, .yellow, .orange, .red, .purple, Color(red: 0.5, green: 0.1, blue: 0.2)][AirQuality.band(value)]
+        AirQuality.level(snapshot.air?.aqi)?.color ?? .secondary
+    }
+    private var aqiScale: some View {
+        HStack(spacing: 5) {
+            ForEach(AirQualityLevel.allCases) { level in
+                let selected = AirQuality.level(snapshot.air?.aqi) == level
+                VStack(spacing: 4) {
+                    Image(systemName: "arrowtriangle.down.fill").font(.system(size: 7))
+                        .opacity(selected ? 1 : 0)
+                    RoundedRectangle(cornerRadius: 3).fill(level.color).frame(height: 6)
+                    Text(level.rangeLabel).font(.system(size: 10)).monospacedDigit().foregroundStyle(.secondary)
+                }.frame(maxWidth: .infinity)
+                    .help(t(level.title) + " · " + level.rangeLabel + " US AQI")
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(t(level.title) + ", " + level.rangeLabel + " US AQI" + (selected ? ", " + t("Сейчас") : ""))
+            }
+        }.accessibilityLabel(t("Шкала US AQI"))
     }
     private var aqiHero: some View {
         VStack(alignment: .leading, spacing: 9) {
@@ -188,6 +203,7 @@ struct PanelView: View {
                 Text("PM2.5  \(number(snapshot.air?.pm25, 1)) µg/m³   ·   PM10  \(number(snapshot.air?.pm10, 1)) µg/m³")
                     .font(.system(size: 11)).foregroundStyle(.secondary)
             }
+            aqiScale
         }.padding(18).background(aqiColor.opacity(0.09), in: RoundedRectangle(cornerRadius: 16))
             .overlay(alignment: .leading) { RoundedRectangle(cornerRadius: 2).fill(aqiColor).frame(width: 3).padding(.vertical, 20) }
     }
