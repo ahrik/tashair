@@ -88,8 +88,14 @@ struct Preferences: Codable {
         }
     }
     func authorize() async -> Bool {
-        do { _ = try await center.requestAuthorization(options: [.alert, .sound]); await checkPermission() }
-        catch { problem = error.localizedDescription }
+        let result: (Bool, String?) = await withCheckedContinuation { continuation in
+            center.requestAuthorization(options: [.alert, .sound]) { granted, error in
+                continuation.resume(returning: (granted, error?.localizedDescription))
+            }
+        }
+        notificationPermission = result.0
+        if let message = result.1 { problem = message }
+        await checkPermission()
         return notificationPermission
     }
     func enableRule(_ index: Int, enabled: Bool) {
@@ -139,8 +145,13 @@ struct Preferences: Codable {
         let content = UNMutableNotificationContent()
         content.title = title; content.body = body; content.sound = .default
         content.userInfo = ["section": section]
-        do { try await center.add(UNNotificationRequest(identifier: id, content: content, trigger: nil)) }
-        catch { problem = error.localizedDescription }
+        let request = UNNotificationRequest(identifier: id, content: content, trigger: nil)
+        let failure: String? = await withCheckedContinuation { continuation in
+            center.add(request) { error in
+                continuation.resume(returning: error?.localizedDescription)
+            }
+        }
+        if let failure { problem = failure }
     }
     func open(_ section: String) {
         guard ["overview", "air", "weather", "sun", "space"].contains(section) else { return }
