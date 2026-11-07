@@ -113,7 +113,7 @@ for source_name, filename, title in PAGES:
 <script src="assets/site.js" defer></script></head><body>
 <a class="skip" href="#content">Перейти к содержимому</a>
 <header class="topbar"><a class="brand" href="index.html"><img src="assets/logo.png" alt="" width="37" height="37">TashAir<span>Документация</span></a>
-<nav class="toplinks" aria-label="Ссылки проекта"><a href="{REPOSITORY}">GitHub</a><a class="download" href="https://github.com/ahrik/tashair/releases/download/v0.1.0/TashAir.dmg">Скачать DMG</a><button class="menu-button" type="button" aria-controls="sidebar" aria-expanded="false">Меню</button></nav></header>
+<nav class="toplinks" aria-label="Ссылки проекта"><a href="{REPOSITORY}">GitHub</a><a class="download" href="https://github.com/ahrik/tashair/releases/download/v0.1.1/TashAir.dmg">Скачать DMG</a><button class="menu-button" type="button" aria-controls="sidebar" aria-expanded="false">Меню</button></nav></header>
 <div class="layout"><aside class="sidebar" id="sidebar"><label class="search-label" for="search">Поиск по документации</label><input class="search" id="search" type="search" placeholder="Например, уведомления" autocomplete="off"><nav class="pages" aria-label="Разделы документации">{navigation(filename)}</nav><p class="sidebar-note">macOS 14 и новее<br>Интерфейс: русский и узбекский<br>Бесплатно, с открытым кодом</p></aside>
 <main id="content"><div class="article"><section class="search-results" aria-label="Результаты поиска" aria-live="polite" hidden></section><article>{content}</article>
 {pagination(filename)}<footer><span>TashAir распространяется под MIT.</span><a href="{REPOSITORY}/issues">Сообщить об ошибке</a></footer></div></main>

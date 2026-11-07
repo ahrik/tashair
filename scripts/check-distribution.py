@@ -19,7 +19,7 @@ def run(*command):
 
 def verify_app(bundle):
     info = plistlib.loads((bundle / 'Contents/Info.plist').read_bytes())
-    assert info['CFBundleShortVersionString'] == '0.1.0'
+    assert info['CFBundleShortVersionString'] == plistlib.loads((root / 'packaging/AppInfo.plist').read_bytes())['CFBundleShortVersionString']
     assert info['LSMinimumSystemVersion'] == '14.0'
     assert info['CFBundleIdentifier'] == 'uz.tashair.desktop'
     extension = bundle / 'Contents/PlugIns/TashAirWidgets.appex'

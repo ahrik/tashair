@@ -4,11 +4,11 @@
 
 Посмотрите качество воздуха, прогноз погоды, УФ и солнечную активность в одной панели. TashAir работает бесплатно, без регистрации, рекламы и аналитики. Код открыт под MIT.
 
-<p class="download-row"><a class="download" href="https://github.com/ahrik/tashair/releases/download/v0.1.0/TashAir.dmg">Скачать TashAir для macOS</a><a href="../docs/INSTALLATION.md">Как установить</a><a href="../docs/USER_GUIDE.md">Открыть руководство</a></p>
+<p class="download-row"><a class="download" href="https://github.com/ahrik/tashair/releases/download/v0.1.1/TashAir.dmg">Скачать TashAir для macOS</a><a href="../docs/INSTALLATION.md">Как установить</a><a href="../docs/USER_GUIDE.md">Открыть руководство</a></p>
 
-[ZIP вместо DMG](https://github.com/ahrik/tashair/releases/download/v0.1.0/TashAir-macOS.zip) · [Контрольные суммы](https://github.com/ahrik/tashair/releases/download/v0.1.0/SHA256SUMS)
+[ZIP вместо DMG](https://github.com/ahrik/tashair/releases/download/v0.1.1/TashAir-macOS.zip) · [Контрольные суммы](https://github.com/ahrik/tashair/releases/download/v0.1.1/SHA256SUMS)
 
-Версия 0.1.0. macOS 14 и новее, Apple Silicon и Intel. Интерфейс на русском и узбекском. Сборка пока с локальной подписью, без нотариализации Apple.
+Версия 0.1.1. macOS 14 и новее, Apple Silicon и Intel. Интерфейс на русском и узбекском. Сборка пока с локальной подписью, без нотариализации Apple.
 
 <img src="../docs/images/overview.png" width="440" alt="Панель TashAir: качество воздуха, температура, УФ и прогноз" />
 

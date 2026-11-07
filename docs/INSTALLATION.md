@@ -2,16 +2,16 @@
 
 Нужны macOS 14 или новее. Универсальный образ содержит Apple Silicon и Intel.
 
-**[Скачать TashAir.dmg — v0.1.0](https://github.com/ahrik/tashair/releases/download/v0.1.0/TashAir.dmg)**
+**[Скачать TashAir.dmg — v0.1.1](https://github.com/ahrik/tashair/releases/download/v0.1.1/TashAir.dmg)**
 
-Альтернатива: [TashAir-macOS.zip](https://github.com/ahrik/tashair/releases/download/v0.1.0/TashAir-macOS.zip). [Контрольные суммы SHA256SUMS](https://github.com/ahrik/tashair/releases/download/v0.1.0/SHA256SUMS) · [Страница релиза](https://github.com/ahrik/tashair/releases/tag/v0.1.0).
+Альтернатива: [TashAir-macOS.zip](https://github.com/ahrik/tashair/releases/download/v0.1.1/TashAir-macOS.zip). [Контрольные суммы SHA256SUMS](https://github.com/ahrik/tashair/releases/download/v0.1.1/SHA256SUMS) · [Страница релиза](https://github.com/ahrik/tashair/releases/tag/v0.1.1).
 
 1. Откройте `TashAir.dmg`.
 2. Перетащите `TashAir.app` в `Applications`.
 3. Запустите приложение из папки «Программы», извлеките образ.
 4. Нажмите значок воздуха в строке меню. Отдельного значка в Dock нет.
 
-Сборка v0.1.0 подписана локально (ad hoc); подписи Developer ID и нотариализации пока нет. Для полученной из доверенного исходного кода сборки macOS может потребовать индивидуального разрешения через «Системные настройки → Конфиденциальность и безопасность → Всё равно открыть». Не отключайте Gatekeeper глобально.
+Сборка v0.1.1 подписана локально (ad hoc); подписи Developer ID и нотариализации пока нет. Для полученной из доверенного исходного кода сборки macOS может потребовать индивидуального разрешения через «Системные настройки → Конфиденциальность и безопасность → Всё равно открыть». Не отключайте Gatekeeper глобально.
 
 Самостоятельная сборка описана в README и CONTRIBUTING. Готовые архивы имеют контрольные суммы в `SHA256SUMS`:
 

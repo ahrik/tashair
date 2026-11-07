@@ -4,7 +4,7 @@
 
 **Воздух, погода и солнечная активность Ташкента — в строке меню macOS.**
 
-Бесплатное открытое приложение без регистрации, рекламы и аналитики. Версия **0.1.0**, macOS **14+**, Apple Silicon и Intel. Интерфейс: русский и узбекский (латиница).
+Бесплатное открытое приложение без регистрации, рекламы и аналитики. Версия **0.1.1**, macOS **14+**, Apple Silicon и Intel. Интерфейс: русский и узбекский (латиница).
 
 ## Возможности
 
@@ -24,7 +24,7 @@
 
 ## Скачать
 
-**[Скачать TashAir для macOS — DMG](https://github.com/ahrik/tashair/releases/download/v0.1.0/TashAir.dmg)** · [ZIP](https://github.com/ahrik/tashair/releases/download/v0.1.0/TashAir-macOS.zip) · [SHA256SUMS](https://github.com/ahrik/tashair/releases/download/v0.1.0/SHA256SUMS)
+**[Скачать TashAir для macOS — DMG](https://github.com/ahrik/tashair/releases/download/v0.1.1/TashAir.dmg)** · [ZIP](https://github.com/ahrik/tashair/releases/download/v0.1.1/TashAir-macOS.zip) · [SHA256SUMS](https://github.com/ahrik/tashair/releases/download/v0.1.1/SHA256SUMS)
 
 Универсальная сборка для Apple Silicon и Intel. [Инструкция установки](docs/INSTALLATION.md). Подпись локальная (ad hoc), без нотариализации Apple.
 

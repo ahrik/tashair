@@ -425,7 +425,7 @@ struct PanelView: View {
                 Link("CC BY 4.0 · Open-Meteo", destination: URL(string: "https://open-meteo.com/en/terms")!)
                 Divider()
                 heading("О программе")
-                Text("TashAir 0.1.0 · MIT").font(.caption)
+                Text("TashAir 0.1.1 · MIT").font(.caption)
                 Text(t("Без регистрации, рекламы и аналитики. Настройки и кэш хранятся на вашем Mac.")).font(.caption).foregroundStyle(.secondary)
                 Button(t("Завершить TashAir")) { NSApp.terminate(nil) }
             }.padding(20)

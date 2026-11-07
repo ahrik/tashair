@@ -275,24 +275,38 @@ struct TopicWidgetView: View {
             if compact { Text(t("Модельная оценка")).font(.system(size: 9)).foregroundStyle(.secondary) }
         }
     }
+    private func weatherNumber(_ number: Double?, format: String) -> String {
+        guard let number, number.isFinite else { return "—" }
+        return String(format: format, number)
+    }
+    private var precipitationSummary: String {
+        let amount = weatherNumber(today?.precipitation, format: "%.1f")
+        return "\(t("Осадки")): \(amount) \(t("мм"))"
+    }
     private var weather: some View {
         VStack(alignment: .leading, spacing: 5) {
-            HStack {
-                value(snapshot.weather?.temperature, unit: "°C", prominent: true)
-                Image(systemName: WeatherCode.symbol(snapshot.weather?.code)).symbolRenderingMode(.multicolor)
-                if !compact {
-                    Spacer()
-                    detail("Ощущается", value: snapshot.weather?.apparent, unit: "°C")
-                    detail("Ветер", value: snapshot.weather?.wind, unit: t("м/с"))
-                }
-            }
+            weatherCurrent
             Text(t(WeatherCode.title(snapshot.weather?.code))).font(.system(size: 11)).lineLimit(1)
-            HStack(spacing: 8) {
-                Text("↓ " + (today?.minimum.map { String(format: "%.0f°", $0) } ?? "—"))
-                Text("↑ " + (today?.maximum.map { String(format: "%.0f°", $0) } ?? "—"))
-                if !compact { Text(t("Осадки") + ": " + (today?.precipitation.map { String(format: "%.1f", $0) } ?? "—") + " " + t("мм")) }
-            }.font(.system(size: 10)).foregroundStyle(.secondary).lineLimit(1)
+            weatherDaily
         }
+    }
+    private var weatherCurrent: some View {
+        HStack {
+            value(snapshot.weather?.temperature, unit: "°C", prominent: true)
+            Image(systemName: WeatherCode.symbol(snapshot.weather?.code)).symbolRenderingMode(.multicolor)
+            if !compact {
+                Spacer()
+                detail("Ощущается", value: snapshot.weather?.apparent, unit: "°C")
+                detail("Ветер", value: snapshot.weather?.wind, unit: t("м/с"))
+            }
+        }
+    }
+    private var weatherDaily: some View {
+        HStack(spacing: 8) {
+            Text("↓ " + weatherNumber(today?.minimum, format: "%.0f°"))
+            Text("↑ " + weatherNumber(today?.maximum, format: "%.0f°"))
+            if !compact { Text(precipitationSummary) }
+        }.font(.system(size: 10)).foregroundStyle(.secondary).lineLimit(1)
     }
     private var solar: some View {
         VStack(alignment: .leading, spacing: 5) {

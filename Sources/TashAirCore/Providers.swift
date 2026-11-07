@@ -21,7 +21,7 @@ public actor HTTPClient {
         if let deadline = retry[host], deadline > Date() { throw ProviderError.backoff(deadline) }
         var request = URLRequest(url: url)
         request.timeoutInterval = 25
-        request.setValue("TashAir/0.1.0 (non-commercial macOS environmental dashboard)", forHTTPHeaderField: "User-Agent")
+        request.setValue("TashAir/0.1.1 (non-commercial macOS environmental dashboard)", forHTTPHeaderField: "User-Agent")
         if let old = validators[url] {
             request.setValue(old.1, forHTTPHeaderField: "If-None-Match")
             request.setValue(old.2, forHTTPHeaderField: "If-Modified-Since")
