@@ -22,7 +22,7 @@ gh repo create ahrik/tashair --public --description 'Tashkent air quality, weath
 git push origin main
 ```
 
-В Settings → General → Default branch выберите **main**. После смены основной ветки проверьте ограничения окружения `github-pages`: оно должно разрешать публикацию из `main`. Workflow документации автоматически использует основную ветку репозитория; его код при переименовании менять не нужно.
+В Settings → General → Default branch выберите **main**. После смены основной ветки проверьте ограничения окружения `github-pages`: оно должно разрешать публикацию из `main`. Workflow документации публикует книгу только из `main`; сборка и проверка продолжают выполняться для всех веток и PR.
 
 ## Включение GitHub Pages
 
@@ -32,7 +32,7 @@ git push origin main
 gh api --method POST repos/ahrik/tashair/pages -f build_type=workflow
 ```
 
-Если Pages уже включён, проверьте, что источник — GitHub Actions. У окружения `github-pages` должны быть разрешены развёртывания из основной ветки. Затем запустите Documentation в разделе Actions; сборка и проверка проходят на каждой ветке, публикация — только из основной. Перезапуск из CLI:
+Если Pages уже включён, проверьте, что источник — GitHub Actions. У окружения `github-pages` должны быть разрешены развёртывания из основной ветки. Затем запустите Documentation в разделе Actions; сборка и проверка проходят на каждой ветке, публикация — только из `main`. Перезапуск из CLI:
 
 ```sh
 gh workflow run docs.yml --repo ahrik/tashair --ref main

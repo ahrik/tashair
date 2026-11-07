@@ -50,7 +50,7 @@ temp/docs-venv/bin/python scripts/check-docs.py
 python3 -m http.server 8768 --bind 127.0.0.1 --directory temp/site
 ```
 
-При локальном просмотре откройте `http://127.0.0.1:8768/`. GitHub Actions собирает и проверяет книгу на каждой ветке и в PR, а публикует только из основной ветки репозитория. В Settings → Pages выбирается GitHub Actions. Инструкция — в [публикации](docs/PUBLISHING.md). Ссылки на исходники привязаны к SHA сборки через `TASHAIR_SOURCE_REF`; локально используется текущий HEAD, в архиве без Git — `main`.
+При локальном просмотре откройте `http://127.0.0.1:8768/`. GitHub Actions собирает и проверяет книгу на каждой ветке и в PR, а публикует только из `main`. В Settings → Pages выбирается GitHub Actions. Инструкция — в [публикации](docs/PUBLISHING.md). Ссылки на исходники привязаны к SHA сборки через `TASHAIR_SOURCE_REF`; локально используется текущий HEAD, в архиве без Git — `main`.
 
 ## Правила
 
