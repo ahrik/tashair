@@ -41,7 +41,11 @@ python3 scripts/check-distribution.py --universal
 
 ## Документация
 
+Сайт книги подготовлен для GitHub Pages по адресу `https://ahrik.github.io/tashair/`; он станет доступен после публикации репозитория и включения Pages.
+
 - [Руководство пользователя](docs/USER_GUIDE.md)
+- [Виджеты macOS](docs/WIDGETS.md)
+- [Уведомления](docs/ALERTS.md)
 - [Источники, методика и условия использования](docs/DATA_SOURCES.md)
 - [Конфиденциальность](docs/PRIVACY.md)
 - [Сборка, тесты и участие](CONTRIBUTING.md)

@@ -1,6 +1,6 @@
 # Third-party notices
 
-The SwiftPM wrapper and initial WidgetKit project structure were adapted from
+The SwiftPM wrapper, initial WidgetKit project structure and documentation site were adapted from
 [Sumbar](https://github.com/ahrik/sumbar), under the MIT License:
 
 Copyright (c) 2026 Sumbar contributors

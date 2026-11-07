@@ -38,6 +38,20 @@ python3 scripts/check-distribution.py --universal
 
 При наличии собственной Developer ID Application можно задать `TASHAIR_SIGN_IDENTITY`. Это включает подпись, но не нотариализацию. Сертификаты и пароли не входят в репозиторий. CI собирает и проверяет архивы, без публикации релизов и сайта.
 
+## Сайт документации
+
+Документация собирается в статическую книгу с оглавлением, поиском и переходами между страницами. Исходники берутся из существующих Markdown-файлов; отдельная главная страница находится в `web/index.md`. Сайт не использует сторонние шрифты, аналитику и серверный поиск.
+
+```sh
+python3 -m venv temp/docs-venv
+temp/docs-venv/bin/python -m pip install -r web/requirements.txt
+temp/docs-venv/bin/python scripts/build-docs.py
+temp/docs-venv/bin/python scripts/check-docs.py
+python3 -m http.server 8768 --bind 127.0.0.1 --directory temp/site
+```
+
+При локальном просмотре откройте `http://127.0.0.1:8768/`. GitHub Actions собирает и проверяет книгу на каждой ветке и в PR, а публикует только из основной ветки репозитория. В Settings → Pages выбирается GitHub Actions. Инструкция — в [публикации](docs/PUBLISHING.md). Ссылки на исходники привязаны к SHA сборки через `TASHAIR_SOURCE_REF`; локально используется текущий HEAD, в архиве без Git — `main`.
+
 ## Правила
 
 - Не заменяйте пропуски нулями, прогноз наблюдением или время загрузки временем измерения.
