@@ -7,6 +7,7 @@ import TashAirCore
     static func run(directory: URL) async throws {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         try renderStatusBadges(directory: directory)
+        try renderAdvice(directory: directory)
         let repository = EnvironmentRepository(directory: directory.appendingPathComponent("cache"))
         let state = await repository.refresh(force: true)
         try JSONEncoder().encode(state.snapshot).write(to: directory.appendingPathComponent("snapshot.json"), options: .atomic)
@@ -28,6 +29,24 @@ import TashAirCore
         }
         print("Live API report: \(String(data: try JSONSerialization.data(withJSONObject: report), encoding: .utf8)!)")
         guard state.errors.isEmpty, state.snapshot.fetched.count == Feed.allCases.count else { throw ProviderError.invalidData("one or more live sources failed; see report.json") }
+    }
+    private static func renderAdvice(directory: URL) throws {
+        let now = Date()
+        for language in Language.allCases {
+            for dark in [false, true] {
+                for severe in [false, true] {
+                    var snapshot = EnvironmentSnapshot()
+                    snapshot.fetched = [.air: now, .weather: now]
+                    snapshot.air = try Providers.air(JSONSerialization.data(withJSONObject: ["current": ["time": now.timeIntervalSince1970, "us_aqi": severe ? 220 : 64], "hourly": ["time": [now.timeIntervalSince1970]]]))
+                    snapshot.weather = try Providers.weather(JSONSerialization.data(withJSONObject: ["current": ["time": now.timeIntervalSince1970, "temperature_2m": severe ? 36 : 20, "weather_code": severe ? 95 : 0, "wind_gusts_10m": severe ? 18 : 0], "hourly": ["time": [now.timeIntervalSince1970], "uv_index": [severe ? 9 : 1]], "daily": ["time": [now.timeIntervalSince1970]]]))
+                    let view = ScrollView {
+                        AdviceView(snapshot: snapshot, errors: [:], now: now, language: language).padding(20)
+                    }.background(Color(nsColor: .windowBackgroundColor))
+                        .environment(\.colorScheme, dark ? .dark : .light)
+                    try render(view, to: directory.appendingPathComponent("advice-\(severe ? "severe" : "moderate")-\(language.rawValue)-\(dark ? "dark" : "light").png"), dark: dark, size: NSSize(width: 540, height: 900))
+                }
+            }
+        }
     }
     private static func renderStatusBadges(directory: URL) throws {
         let examples: [Double] = [28, 64, 125, 175, 250, 350]

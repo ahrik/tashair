@@ -207,6 +207,9 @@ struct PanelView: View {
         }.padding(18).background(aqiColor.opacity(0.09), in: RoundedRectangle(cornerRadius: 16))
             .overlay(alignment: .leading) { RoundedRectangle(cornerRadius: 2).fill(aqiColor).frame(width: 3).padding(.vertical, 20) }
     }
+    private func advice(_ section: Feed? = nil) -> some View {
+        AdviceView(snapshot: snapshot, errors: store.errors, now: store.now, language: store.preferences.language, section: section)
+    }
     private var overview: some View {
         Group {
             aqiHero
@@ -220,6 +223,7 @@ struct PanelView: View {
                 Text(Metric.kp.formatted(snapshot.value(.kp, at: store.now)) + " Kp").font(.system(size: 18, weight: .medium, design: .rounded))
                 Button { store.open("space") } label: { Image(systemName: "chevron.right") }.buttonStyle(.plain)
             }
+            advice()
             heading("Воздух", subtitle: "Прогноз")
             TimelineChart(values: airHours(forecast: true, count: 24).map { ($0.time, $0.aqi) }, unit: "US AQI", now: store.now)
             source(.air, time: snapshot.air?.time)
@@ -236,6 +240,7 @@ struct PanelView: View {
         Group {
             aqiHero
             Text(t("Данные характеризуют территорию, а не конкретную улицу. Разрешение модели — около 45 км.")).font(.caption).foregroundStyle(.secondary)
+            advice(.air)
             Picker("", selection: $airForecast) {
                 Text(t("Сутки")).tag(false)
                 Text(t("Прогноз") + " · " + t("5 дней")).tag(true)
@@ -263,6 +268,7 @@ struct PanelView: View {
                 Spacer()
                 Image(systemName: WeatherCode.symbol(snapshot.weather?.code)).symbolRenderingMode(.multicolor).font(.system(size: 54))
             }
+            if weatherPeriod == 0 { advice(.weather) }
             Picker("", selection: $weatherPeriod) {
                 Text(t("Сутки")).tag(0); Text(t("7 дней")).tag(1); Text(t("16 дней")).tag(2); Text(t("История 30 дней")).tag(3)
             }.pickerStyle(.segmented).labelsHidden()
