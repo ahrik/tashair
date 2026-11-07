@@ -167,20 +167,7 @@ struct PanelView: View {
         AirQuality.level(snapshot.air?.aqi)?.color ?? .secondary
     }
     private var aqiScale: some View {
-        HStack(spacing: 5) {
-            ForEach(AirQualityLevel.allCases) { level in
-                let selected = AirQuality.level(snapshot.air?.aqi) == level
-                VStack(spacing: 4) {
-                    Image(systemName: "arrowtriangle.down.fill").font(.system(size: 7))
-                        .opacity(selected ? 1 : 0)
-                    RoundedRectangle(cornerRadius: 3).fill(level.color).frame(height: 6)
-                    Text(level.rangeLabel).font(.system(size: 10)).monospacedDigit().foregroundStyle(.secondary)
-                }.frame(maxWidth: .infinity)
-                    .help(t(level.title) + " · " + level.rangeLabel + " US AQI")
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(t(level.title) + ", " + level.rangeLabel + " US AQI" + (selected ? ", " + t("Сейчас") : ""))
-            }
-        }.accessibilityLabel(t("Шкала US AQI"))
+        AQIScaleView(aqi: snapshot.air?.aqi, language: store.language)
     }
     private var aqiHero: some View {
         VStack(alignment: .leading, spacing: 9) {
