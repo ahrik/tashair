@@ -365,7 +365,7 @@ struct PanelView: View {
                 heading("Настройки")
                 Picker(t("Язык"), selection: $store.preferences.language) { ForEach(Language.allCases) { Text($0.title).tag($0) } }
                 Picker(t("Строка меню"), selection: $store.preferences.menuMetric) { ForEach(Metric.allCases) { Text(t($0.title)).tag($0) } }
-                Toggle(t("Автозапуск"), isOn: Binding(get: { store.loginEnabled }, set: store.setLogin))
+                Toggle(t("Автозапуск"), isOn: Binding(get: { store.loginEnabled }, set: { store.setLogin($0) }))
                 Divider()
                 heading("Уведомления")
                 Text(t("Уведомления работают, пока TashAir запущен и Mac не спит. Пропущенные сводки не повторяются.")).font(.caption).foregroundStyle(.secondary)
@@ -385,7 +385,7 @@ struct PanelView: View {
                         }
                     }
                 }
-                Toggle(t("Ежедневная сводка"), isOn: Binding(get: { store.preferences.summary }, set: store.enableSummary))
+                Toggle(t("Ежедневная сводка"), isOn: Binding(get: { store.preferences.summary }, set: { store.enableSummary($0) }))
                 HStack {
                     Text(t("Время по Ташкенту")).font(.caption)
                     Spacer()
